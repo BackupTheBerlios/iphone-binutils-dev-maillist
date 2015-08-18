@@ -1,0 +1,66 @@
+From dario at nycjava.net  Sun Sep  9 17:39:37 2007
+From: dario at nycjava.net (Dario Laverde)
+Date: Sun, 9 Sep 2007 11:39:37 -0400 (EDT)
+Subject: [Iphone-binutils-dev] help with signal/exception handling
+	(include/arm/signal.h)
+Message-ID: <23065.64.71.26.219.1189352377.squirrel@64.71.26.219>
+
+Hello all,
+
+I'm trying to build an app (a java vm) with the .20 toolchain and I'm getting stuck at:
+
+signal.c:77: error: 'struct sigcontext' has no member named 'sc_esp'
+
+Taking a look at the struct in question at: include/arm/signal.h:
+http://svn.berlios.de/viewcvs/iphone-binutils/trunk/include/arm/signal.h?rev=134&view=markup
+
+we see sigcontext defined as:
+
+struct	sigcontext {
+    int			sc_onstack;	/* sigstack state to restore */
+    int			sc_mask;	/* signal mask to restore */
+    unsigned int    sc_r0;
+    unsigned int    sc_r1;
+    unsigned int    sc_r2;
+    unsigned int    sc_r3;
+    unsigned int    sc_r4;
+    unsigned int    sc_r5;
+    unsigned int    sc_r6;
+    unsigned int    sc_r7;
+    unsigned int    sc_r8;
+    unsigned int    sc_r9;
+    unsigned int    sc_r10;
+    unsigned int    sc_r11;
+    unsigned int    sc_r12;
+    unsigned int    sc_r13;
+    unsigned int    sc_r14;
+    unsigned int    sc_r15;
+    unsigned int    sc_r16;
+};
+
+
+I need to replace sc_esp with one of the sc_r* register name but I don't know which
+one.
+
+Assistance from a signal/exception handling expert would be appreciated.
+
+thanks,
+Dario
+
+
+
+
+From pcwalton at uchicago.edu  Sun Sep  9 18:28:11 2007
+From: pcwalton at uchicago.edu (pcwalton at uchicago.edu)
+Date: Sun,  9 Sep 2007 11:28:11 -0500 (CDT)
+Subject: [Iphone-binutils-dev] help with signal/exception handling
+Message-ID: <20070909112811.ATS23464@m4500-01.uchicago.edu>
+
+sc_esp? That's the stack pointer on x86. Are you sure you're building for an ARM 
+host?
+
+In any case, the stack pointer is r14 on the ARM. See the ARM Procedure Call 
+Standard for more details.
+
+
+

@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iphone-binutils-dev] Native llvm-gcc4-arm support
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iphone-binutils-dev/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:iphone-binutils-dev%40lists.berlios.de?Subject=Re%3A%20%5BIphone-binutils-dev%5D%20Native%20llvm-gcc4-arm%20support&In-Reply-To=%3C8E97A579-EBAC-43E9-A8FC-A6F84EF13B57%40uchicago.edu%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000004.html">
+   <LINK REL="Next"  HREF="000006.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iphone-binutils-dev] Native llvm-gcc4-arm support</H1>
+    <B>Patrick Walton</B> 
+    <A HREF="mailto:iphone-binutils-dev%40lists.berlios.de?Subject=Re%3A%20%5BIphone-binutils-dev%5D%20Native%20llvm-gcc4-arm%20support&In-Reply-To=%3C8E97A579-EBAC-43E9-A8FC-A6F84EF13B57%40uchicago.edu%3E"
+       TITLE="[Iphone-binutils-dev] Native llvm-gcc4-arm support">pcwalton at uchicago.edu
+       </A><BR>
+    <I>Sun Aug 19 14:12:24 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000004.html">[Iphone-binutils-dev] Native llvm-gcc4-arm support
+</A></li>
+        <LI>Next message: <A HREF="000006.html">[Iphone-binutils-dev] Native llvm-gcc4-arm support
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#5">[ date ]</a>
+              <a href="thread.html#5">[ thread ]</a>
+              <a href="subject.html#5">[ subject ]</a>
+              <a href="author.html#5">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Could you elaborate a little more on what issues you're exactly  
+running into? How is the generated code in the current implementation  
+not correct?
+
+Patrick
+
+On Aug 20, 2007, at 10:14 AM, Landon Fuller wrote:
+
+&gt;<i> After running into a variety of issues due to the driver's  
+</I>&gt;<i> piggybacking on the host's llvm-gcc4, I started working on adding  
+</I>&gt;<i> arm/darwin support directly to llvm-gcc4 -- Since I'm running out  
+</I>&gt;<i> of free time this weekend, I've attached my in-progress patch  
+</I>&gt;<i> below. It should be nearly functional, but I haven't had the chance  
+</I>&gt;<i> to test the output or sort out the bootstrapping issues.
+</I>&gt;<i>
+</I>&gt;<i> There are two big changes in using an arm-targeted front-end (in  
+</I>&gt;<i> addition to the generated code being more correct):
+</I>&gt;<i> 	- The custom driver is no longer necessary, as llvm-gcc4-arm can  
+</I>&gt;<i> drive the binutils directly.
+</I>&gt;<i> 	- Bootstrapping the compiler is a bit more complex
+</I>&gt;<i>
+</I>&gt;<i> I'd appreciate thoughts on how to best handle the above.
+</I>&gt;<i>
+</I>&gt;<i> -landonf&lt;patch-llvm-gcc-arm-v2&gt;
+</I>&gt;<i> _______________________________________________
+</I>&gt;<i> iphone-binutils-dev mailing list
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/iphone-binutils-dev">iphone-binutils-dev at lists.berlios.de</A>
+</I>&gt;<i> <A HREF="https://lists.berlios.de/mailman/listinfo/iphone-binutils-dev">https://lists.berlios.de/mailman/listinfo/iphone-binutils-dev</A>
+</I>
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000004.html">[Iphone-binutils-dev] Native llvm-gcc4-arm support
+</A></li>
+	<LI>Next message: <A HREF="000006.html">[Iphone-binutils-dev] Native llvm-gcc4-arm support
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#5">[ date ]</a>
+              <a href="thread.html#5">[ thread ]</a>
+              <a href="subject.html#5">[ subject ]</a>
+              <a href="author.html#5">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iphone-binutils-dev">More information about the iphone-binutils-dev
+mailing list</a><br>
+</body></html>

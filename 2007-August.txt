@@ -1,0 +1,281 @@
+From rickb at rickb.com  Fri Aug 17 06:52:54 2007
+From: rickb at rickb.com (Richard Burgess)
+Date: Thu, 16 Aug 2007 23:52:54 -0500
+Subject: [Iphone-binutils-dev] floating point problems
+Message-ID: <a0255ea50708162152i4701959dka6fd0cbcf1e17e6b@mail.gmail.com>
+
+#include <stdio.h>
+int main(int argc, char** argv)
+{
+// if you change n to an int it works! 	
+unsigned int n=1; 	
+float a = n; 	
+float b = n; 	
+printf("%f %f\n",a,b);  	
+return 0;
+ }
+
+output (unsigned int n): 1.000000 0.000000
+output (int n): 1.000000 1.000000
+
+After rooting around at the assembly it looks like libarmfp needs to
+do more than just pass through to the signed float conversion
+functions. Once __floatunsidf shows up everything gets screwed up.
+
+
+From rickb at rickb.com  Fri Aug 17 07:23:52 2007
+From: rickb at rickb.com (Richard Burgess)
+Date: Fri, 17 Aug 2007 00:23:52 -0500
+Subject: [Iphone-binutils-dev] Fixed armfp.c
+Message-ID: <a0255ea50708162223s4193ee00m5f4347d82e3c6e2c@mail.gmail.com>
+
+Thanks to the Internets. No freaking clue how it works, but it appears to. :)
+
+#include "armfp.h"
+
+double __floatunsidf (unsigned int i)
+{
+  double r = (double)(int)i;
+  if ((int)i < 0)
+    r += 0x1p32f;
+  return r;
+}
+
+float ARMFP_EXPORT __floatunsisf(unsigned int n)
+{
+	return __floatunsidf(n);
+}
+
+
+From landonf at macports.org  Sun Aug 19 18:32:59 2007
+From: landonf at macports.org (Landon Fuller)
+Date: Sun, 19 Aug 2007 09:32:59 -0700
+Subject: [Iphone-binutils-dev] [PATCH] Support for dylib/bundle linking
+	using libtool (bug #11802)
+Message-ID: <9C85DFB4-A7D7-46D8-9364-A2526C4F4F56@macports.org>
+
+I've submitted this as http://developer.berlios.de/bugs/? 
+func=detailbug&bug_id=11802&group_id=8664
+
+The attached patch modifies the compiler driver to use binutil's  
+libtool to drive linking of bundles/dylibs.
+
+On Darwin, libtool is needed to sit on top of ld -- amongst other  
+things, it handles linking in of object files from static archives.  
+In example, if libtool is not used, the following will not work --  
+the static archive contents will not be included in the dylib:
+     arm-apple-darwin-cc -dynamiclib -o libtest.dylib libstuff.a
+
+The patch:
+     - Fixes the driver's parsing of PATH to be non-destructive. The  
+use of strtok on the original environment string was actually  
+destroying the real PATH (by inserting \0 and thus truncating the path).
+     - Fixes the CPU subtype for ARM processors in the cctool's  
+arch_flags table. (cctools/libstuff/arch.c). This CPU subtype is used  
+to set the Mach headers on the assembled object files; libtool uses  
+the object file's mach header to determine the output library cpu/cpu  
+subtype. This needs to match the iPhone's 12.
+     - Patches the driver (and the cc specs) to use libtool for dylib  
+and bundle linking.
+     - Patches libtool to run the arm-aware arm-apple-darwin-ld,  
+rather than the system ld, when linking.
+     - Adds a new CPU subtype define (CPU_SUBTYPE_ARM_1176JZ) to  
+match the phone and replaces "magic numbers" (12, 6) in the source  
+with the constant. This may not be the best name, but can easily be  
+changed.
+
+Cheers,
+-landonf
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: patch-libtool-driver
+Type: application/octet-stream
+Size: 5546 bytes
+Desc: not available
+URL: <https://lists.berlios.de/pipermail/iphone-binutils-dev/attachments/20070819/36cb704e/attachment.obj>
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: PGP.sig
+Type: application/pgp-signature
+Size: 186 bytes
+Desc: This is a digitally signed message part
+URL: <https://lists.berlios.de/pipermail/iphone-binutils-dev/attachments/20070819/36cb704e/attachment.pgp>
+
+From landonf at macports.org  Mon Aug 20 03:14:07 2007
+From: landonf at macports.org (Landon Fuller)
+Date: Sun, 19 Aug 2007 18:14:07 -0700
+Subject: [Iphone-binutils-dev] Native llvm-gcc4-arm support
+References: <91BB2833-7DAD-4EAA-8C87-6E6F7659197B@threerings.net>
+Message-ID: <8F1B0106-AB4F-4F19-B797-4ADD68910FB9@macports.org>
+
+After running into a variety of issues due to the driver's  
+piggybacking on the host's llvm-gcc4, I started working on adding arm/ 
+darwin support directly to llvm-gcc4 -- Since I'm running out of free  
+time this weekend, I've attached my in-progress patch below. It  
+should be nearly functional, but I haven't had the chance to test the  
+output or sort out the bootstrapping issues.
+
+There are two big changes in using an arm-targeted front-end (in  
+addition to the generated code being more correct):
+	- The custom driver is no longer necessary, as llvm-gcc4-arm can  
+drive the binutils directly.
+	- Bootstrapping the compiler is a bit more complex
+
+I'd appreciate thoughts on how to best handle the above.
+
+-landonf
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: patch-llvm-gcc-arm-v2
+Type: application/octet-stream
+Size: 19127 bytes
+Desc: not available
+URL: <https://lists.berlios.de/pipermail/iphone-binutils-dev/attachments/20070819/dbf8b69f/attachment.obj>
+-------------- next part --------------
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: PGP.sig
+Type: application/pgp-signature
+Size: 186 bytes
+Desc: This is a digitally signed message part
+URL: <https://lists.berlios.de/pipermail/iphone-binutils-dev/attachments/20070819/dbf8b69f/attachment.pgp>
+
+From pcwalton at uchicago.edu  Sun Aug 19 14:12:24 2007
+From: pcwalton at uchicago.edu (Patrick Walton)
+Date: Sun, 19 Aug 2007 21:12:24 +0900
+Subject: [Iphone-binutils-dev] Native llvm-gcc4-arm support
+In-Reply-To: <8F1B0106-AB4F-4F19-B797-4ADD68910FB9@macports.org>
+References: <91BB2833-7DAD-4EAA-8C87-6E6F7659197B@threerings.net>
+	<8F1B0106-AB4F-4F19-B797-4ADD68910FB9@macports.org>
+Message-ID: <8E97A579-EBAC-43E9-A8FC-A6F84EF13B57@uchicago.edu>
+
+Could you elaborate a little more on what issues you're exactly  
+running into? How is the generated code in the current implementation  
+not correct?
+
+Patrick
+
+On Aug 20, 2007, at 10:14 AM, Landon Fuller wrote:
+
+> After running into a variety of issues due to the driver's  
+> piggybacking on the host's llvm-gcc4, I started working on adding  
+> arm/darwin support directly to llvm-gcc4 -- Since I'm running out  
+> of free time this weekend, I've attached my in-progress patch  
+> below. It should be nearly functional, but I haven't had the chance  
+> to test the output or sort out the bootstrapping issues.
+>
+> There are two big changes in using an arm-targeted front-end (in  
+> addition to the generated code being more correct):
+> 	- The custom driver is no longer necessary, as llvm-gcc4-arm can  
+> drive the binutils directly.
+> 	- Bootstrapping the compiler is a bit more complex
+>
+> I'd appreciate thoughts on how to best handle the above.
+>
+> -landonf<patch-llvm-gcc-arm-v2>
+> _______________________________________________
+> iphone-binutils-dev mailing list
+> iphone-binutils-dev at lists.berlios.de
+> https://lists.berlios.de/mailman/listinfo/iphone-binutils-dev
+
+
+
+From landonf at macports.org  Mon Aug 20 18:37:27 2007
+From: landonf at macports.org (Landon Fuller)
+Date: Mon, 20 Aug 2007 09:37:27 -0700
+Subject: [Iphone-binutils-dev] Native llvm-gcc4-arm support
+In-Reply-To: <8E97A579-EBAC-43E9-A8FC-A6F84EF13B57@uchicago.edu>
+References: <91BB2833-7DAD-4EAA-8C87-6E6F7659197B@threerings.net>
+	<8F1B0106-AB4F-4F19-B797-4ADD68910FB9@macports.org>
+	<8E97A579-EBAC-43E9-A8FC-A6F84EF13B57@uchicago.edu>
+Message-ID: <E9C4AEF3-8DD6-4AD0-A129-7111E4DADF6E@macports.org>
+
+
+On Aug 19, 2007, at 5:12 AM, Patrick Walton wrote:
+
+> Could you elaborate a little more on what issues you're exactly  
+> running into? How is the generated code in the current  
+> implementation not correct?
+
+Sure; here are a couple examples I ran into:
+
+- llvm-gcc4-i686 will generate calls to objc_msgSend_fpret() for  
+methods returning double values, but the _fpret implementation is not  
+available (or required) on arm or powerpc.
+
+- llvm-gcc4-ppc generates incorrect bitfield (un)packing code. Take  
+the following simplified example from IP header parsing code:
+		#include <stdio.h>
+		#include <stdint.h>
+		#include <string.h>
+
+		// Hard-code endianness for arm
+		#define LITTLE_ENDIAN
+
+		struct iphdr {
+		#ifdef LITTLE_ENDIAN
+			unsigned char hl:4, version:4;
+		#else
+			unsigned char version:4, hl:4;
+		#endif
+		};
+
+		int main (int argc, char *argv[]) {
+			uint8_t data = 0x45; // Packed version, header length (4, 5);
+			struct iphdr *p = (struct iphdr *) &data;
+			printf("Version: %hhu Header Length: %hhu\n", p->version, p->hl);
+			return 0;
+		}
+
+Compiled on i386, run on iPhone:
+	-bash-3.2# /usr/test
+	Version: 4 Header Length: 5
+
+Compiled on i386, run on i386:
+	landonf at desktop:~> ./test
+	Version: 4 Header Length: 5
+
+Compiled on PPC, run on PPC (with undef LITTLE_ENDIAN):
+	landonf at lappy:~> ./test
+	Version: 4 Header Length: 5
+
+Compiled on PPC, run on iPhone:
+	-bash-3.2# /usr/test
+	Version: 5 Header Length: 4
+
+-landonf
+
+> On Aug 20, 2007, at 10:14 AM, Landon Fuller wrote:
+>
+>> After running into a variety of issues due to the driver's  
+>> piggybacking on the host's llvm-gcc4, I started working on adding  
+>> arm/darwin support directly to llvm-gcc4 -- Since I'm running out  
+>> of free time this weekend, I've attached my in-progress patch  
+>> below. It should be nearly functional, but I haven't had the  
+>> chance to test the output or sort out the bootstrapping issues.
+>>
+>> There are two big changes in using an arm-targeted front-end (in  
+>> addition to the generated code being more correct):
+>> 	- The custom driver is no longer necessary, as llvm-gcc4-arm can  
+>> drive the binutils directly.
+>> 	- Bootstrapping the compiler is a bit more complex
+>>
+>> I'd appreciate thoughts on how to best handle the above.
+>>
+>> -landonf<patch-llvm-gcc-arm-v2>
+>> _______________________________________________
+>> iphone-binutils-dev mailing list
+>> iphone-binutils-dev at lists.berlios.de
+>> https://lists.berlios.de/mailman/listinfo/iphone-binutils-dev
+>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: PGP.sig
+Type: application/pgp-signature
+Size: 186 bytes
+Desc: This is a digitally signed message part
+URL: <https://lists.berlios.de/pipermail/iphone-binutils-dev/attachments/20070820/b988cf7c/attachment.pgp>
+

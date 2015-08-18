@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iphone-binutils-dev] help with signal/exception handling	(include/arm/signal.h)
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iphone-binutils-dev/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:iphone-binutils-dev%40lists.berlios.de?Subject=Re%3A%20%5BIphone-binutils-dev%5D%20help%20with%20signal/exception%20handling%0A%09%28include/arm/signal.h%29&In-Reply-To=%3C23065.64.71.26.219.1189352377.squirrel%4064.71.26.219%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000008.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iphone-binutils-dev] help with signal/exception handling	(include/arm/signal.h)</H1>
+    <B>Dario Laverde</B> 
+    <A HREF="mailto:iphone-binutils-dev%40lists.berlios.de?Subject=Re%3A%20%5BIphone-binutils-dev%5D%20help%20with%20signal/exception%20handling%0A%09%28include/arm/signal.h%29&In-Reply-To=%3C23065.64.71.26.219.1189352377.squirrel%4064.71.26.219%3E"
+       TITLE="[Iphone-binutils-dev] help with signal/exception handling	(include/arm/signal.h)">dario at nycjava.net
+       </A><BR>
+    <I>Sun Sep  9 17:39:37 CEST 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000008.html">[Iphone-binutils-dev] help with signal/exception handling
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#7">[ date ]</a>
+              <a href="thread.html#7">[ thread ]</a>
+              <a href="subject.html#7">[ subject ]</a>
+              <a href="author.html#7">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hello all,
+
+I'm trying to build an app (a java vm) with the .20 toolchain and I'm getting stuck at:
+
+signal.c:77: error: 'struct sigcontext' has no member named 'sc_esp'
+
+Taking a look at the struct in question at: include/arm/signal.h:
+<A HREF="http://svn.berlios.de/viewcvs/iphone-binutils/trunk/include/arm/signal.h?rev=134&amp;view=markup">http://svn.berlios.de/viewcvs/iphone-binutils/trunk/include/arm/signal.h?rev=134&amp;view=markup</A>
+
+we see sigcontext defined as:
+
+struct	sigcontext {
+    int			sc_onstack;	/* sigstack state to restore */
+    int			sc_mask;	/* signal mask to restore */
+    unsigned int    sc_r0;
+    unsigned int    sc_r1;
+    unsigned int    sc_r2;
+    unsigned int    sc_r3;
+    unsigned int    sc_r4;
+    unsigned int    sc_r5;
+    unsigned int    sc_r6;
+    unsigned int    sc_r7;
+    unsigned int    sc_r8;
+    unsigned int    sc_r9;
+    unsigned int    sc_r10;
+    unsigned int    sc_r11;
+    unsigned int    sc_r12;
+    unsigned int    sc_r13;
+    unsigned int    sc_r14;
+    unsigned int    sc_r15;
+    unsigned int    sc_r16;
+};
+
+
+I need to replace sc_esp with one of the sc_r* register name but I don't know which
+one.
+
+Assistance from a signal/exception handling expert would be appreciated.
+
+thanks,
+Dario
+
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000008.html">[Iphone-binutils-dev] help with signal/exception handling
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#7">[ date ]</a>
+              <a href="thread.html#7">[ thread ]</a>
+              <a href="subject.html#7">[ subject ]</a>
+              <a href="author.html#7">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iphone-binutils-dev">More information about the iphone-binutils-dev
+mailing list</a><br>
+</body></html>

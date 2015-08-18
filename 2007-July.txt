@@ -1,0 +1,51 @@
+From pcwalton at uchicago.edu  Tue Jul 17 08:23:11 2007
+From: pcwalton at uchicago.edu (pcwalton at uchicago.edu)
+Date: Tue, 17 Jul 2007 01:23:11 -0500 (CDT)
+Subject: [Iphone-binutils-dev] Development plan
+Message-ID: <20070717012311.ARU56802@m4500-01.uchicago.edu>
+
+Hey everyone,
+
+Glad to see your interest in the iPhone binutils toolchain. With your help, we can 
+make a set of open, free development tools that Apple will wish they had when 
+developing the phone. :)
+
+Let me give a general overview of where we are. The major parts of the 
+toolchain are as follows:
+
+LLVM: Apple is going to be using LLVM in the future for their GCC toolchain, so 
+we should support it. We can use it now to get to the assembly stage, but it has 
+serious compiler bugs, so we can't rely on it.
+
+GCC: This should be the primary way to go from C source to assembler. We'll 
+need to make our own modifications to make this work - naturally GCC works 
+with the ARM, but making it work with Apple's dynamic linker is a different 
+kettle of fish. I'll be focusing on this over the next few days: hopefully it 
+shouldn't be too much work. We can use LLVM as a guide for this, because 
+Apple's modifications to LLVM are publicly available.
+
+as: We need this to assemble source object files. Apple's as is based on the 
+ancient gas 1.38, which predates BFD, the system modern GNU uses to produce 
+object files. BFD has no support for writing Mach-O format files, and the ARM 
+assembler in the current gas is horribly welded to BFD. We need to write our 
+own assembler, and this is where we could use the most help right now. I've 
+already received a patch from tmiw, and hopefully you can help us out more.
+
+ld: We need to extend Apple's linker with support for ARM. This shouldn't be too 
+bad at all, once we have the assembler done: all we need is to implement ARM-
+specific relocs, as well as a little glue code.
+
+crt: This is the C runtime file that manages dynamic linking and sets up the C 
+environment, necessary to run C programs. I've already written this for 
+programs, and you can find it in the Csu directory. Possible improvements 
+include support for creating dynamic libraries, which will be needed for some 
+things like bash (needs readline).
+
+That's where we are right now. If you'd like more information, please don't 
+hesitate to contact me at this e-mail address or on IRC: irc.osx86.hu nick 
+nightwatch. We probably aren't far off from having a working toolchain!
+
+Patrick
+
+
+

@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iphone-binutils-dev] Fixed armfp.c
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iphone-binutils-dev/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:iphone-binutils-dev%40lists.berlios.de?Subject=Re%3A%20%5BIphone-binutils-dev%5D%20Fixed%20armfp.c&In-Reply-To=%3Ca0255ea50708162223s4193ee00m5f4347d82e3c6e2c%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000001.html">
+   <LINK REL="Next"  HREF="000003.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iphone-binutils-dev] Fixed armfp.c</H1>
+    <B>Richard Burgess</B> 
+    <A HREF="mailto:iphone-binutils-dev%40lists.berlios.de?Subject=Re%3A%20%5BIphone-binutils-dev%5D%20Fixed%20armfp.c&In-Reply-To=%3Ca0255ea50708162223s4193ee00m5f4347d82e3c6e2c%40mail.gmail.com%3E"
+       TITLE="[Iphone-binutils-dev] Fixed armfp.c">rickb at rickb.com
+       </A><BR>
+    <I>Fri Aug 17 07:23:52 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000001.html">[Iphone-binutils-dev] floating point problems
+</A></li>
+        <LI>Next message: <A HREF="000003.html">[Iphone-binutils-dev] [PATCH] Support for dylib/bundle linking	using libtool (bug #11802)
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Thanks to the Internets. No freaking clue how it works, but it appears to. :)
+
+#include &quot;armfp.h&quot;
+
+double __floatunsidf (unsigned int i)
+{
+  double r = (double)(int)i;
+  if ((int)i &lt; 0)
+    r += 0x1p32f;
+  return r;
+}
+
+float ARMFP_EXPORT __floatunsisf(unsigned int n)
+{
+	return __floatunsidf(n);
+}
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000001.html">[Iphone-binutils-dev] floating point problems
+</A></li>
+	<LI>Next message: <A HREF="000003.html">[Iphone-binutils-dev] [PATCH] Support for dylib/bundle linking	using libtool (bug #11802)
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iphone-binutils-dev">More information about the iphone-binutils-dev
+mailing list</a><br>
+</body></html>
